@@ -38,7 +38,7 @@ public class OnixcoinMainNetParamsTest {
     }
 
     @Test
-    public void testRegTestGenesisBlock() {
+    public void testMainGenesisBlock() {
         Block genesis = params.getGenesisBlock();
         Assert.assertEquals("000007140b7a6ca0b64965824f5731f6e86daadf19eb299033530b1e61236e43", genesis.getHashAsString());
     }
