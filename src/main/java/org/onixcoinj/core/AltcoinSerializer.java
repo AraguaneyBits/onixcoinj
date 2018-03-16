@@ -1,7 +1,8 @@
-package org.libdohj.core;
+package org.onixcoinj.core;
 
 import org.bitcoinj.core.*;
 import org.bitcoinj.core.Utils;
+import org.onixcoinj.params.AuxPoWNetworkParameters;
 
 /**
  * @author jrn

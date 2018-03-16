@@ -23,8 +23,8 @@ import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.utils.MonetaryFormat;
 import org.dashj.hash.X11;
-import org.libdohj.core.AltcoinNetworkParameters;
-import org.libdohj.core.AltcoinSerializer;
+import org.onixcoinj.core.AltcoinNetworkParameters;
+import org.onixcoinj.core.AltcoinSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

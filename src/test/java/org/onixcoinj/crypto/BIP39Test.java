@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onixcoinj.params;
+package org.onixcoinj.crypto;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Date;
@@ -27,6 +27,7 @@ import org.bitcoinj.wallet.Wallet;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.onixcoinj.params.OnixcoinMainNetParams;
 
 /**
  * @date 13-ene-2018
@@ -64,7 +65,7 @@ public class BIP39Test {
 
             // new wallet with mnemonic seed
             Wallet wallet = Wallet.fromSeed(params, seed);
-
+            System.out.println(wallet);
             DeterministicKeyChain keyChain = DeterministicKeyChain.builder().seed(seed).build();
 
             // Derive 100 children 

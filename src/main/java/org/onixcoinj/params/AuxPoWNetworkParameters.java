@@ -1,4 +1,6 @@
-/**
+package org.onixcoinj.params;
+
+/*
  * Copyright 2015 Ross Nicoll
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,22 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.libdohj.core;
-
-import org.bitcoinj.core.Sha256Hash;
-
 /**
- * Scrypt hash. Currently extends Sha256Hash (so no real type safety is provided),
- * but in time the two classes should have a common superclass rather than one
- * extending the other directly.
+ *
+ * @author Ross Nicoll
  */
-public class ScryptHash extends Sha256Hash {
+public interface AuxPoWNetworkParameters extends AltcoinNetworkParameters {
 
-    public ScryptHash(byte[] rawHashBytes) {
-        super(rawHashBytes);
-    }
-    
-    public ScryptHash(String hexString) {
-        super(hexString);
-    }
+    boolean isAuxPoWBlockVersion(long version);
+
+    int getChainID();
 }

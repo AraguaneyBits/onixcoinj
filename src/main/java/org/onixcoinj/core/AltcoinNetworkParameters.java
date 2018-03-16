@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.libdohj.core;
+package org.onixcoinj.core;
 
 import org.bitcoinj.core.Block;
 import org.bitcoinj.core.Coin;

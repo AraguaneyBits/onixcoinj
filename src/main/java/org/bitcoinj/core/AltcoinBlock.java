@@ -17,9 +17,7 @@
 
 package org.bitcoinj.core;
 
-import org.libdohj.core.AltcoinNetworkParameters;
-import org.libdohj.core.AuxPoWNetworkParameters;
-import org.libdohj.core.ScryptHash;
+import org.onixcoinj.core.AltcoinNetworkParameters;
 
 
 import javax.annotation.Nullable;
@@ -32,7 +30,10 @@ import java.util.BitSet;
 import java.util.List;
 
 import static org.bitcoinj.core.Utils.reverseBytes;
-import static org.libdohj.core.Utils.scryptDigest;
+
+import org.onixcoinj.core.ScryptHash;
+import static org.onixcoinj.core.Utils.scryptDigest;
+import org.onixcoinj.params.AuxPoWNetworkParameters;
 
 /**
  * <p>A block is a group of transactions, and is one of the fundamental data structures of the Bitcoin system.

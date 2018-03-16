@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onixcoinj.params;
+package org.onixcoinj.core;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -25,6 +25,7 @@ import org.bitcoinj.utils.BlockFileLoader;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.onixcoinj.params.OnixcoinMainNetParams;
 
 /**
  * @date 13-ene-2018

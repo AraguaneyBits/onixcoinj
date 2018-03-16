@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.libdohj.core;
+package org.onixcoinj.core;
 
 import com.lambdaworks.crypto.SCrypt;
 import java.security.GeneralSecurityException;
@@ -23,9 +23,10 @@ import java.security.GeneralSecurityException;
  *
  */
 public class Utils {
+
     /**
-     * Calculates the Scrypt hash of the given byte range.
-     * The resulting hash is in small endian form.
+     * Calculates the Scrypt hash of the given byte range. The resulting hash is
+     * in small endian form.
      */
     public static byte[] scryptDigest(byte[] input) throws GeneralSecurityException {
         return SCrypt.scrypt(input, input, 1024, 1, 1, 32);
