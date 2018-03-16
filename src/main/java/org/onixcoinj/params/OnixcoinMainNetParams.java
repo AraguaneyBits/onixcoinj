@@ -38,6 +38,7 @@ import org.bitcoinj.store.BlockStore;
 import org.bitcoinj.store.BlockStoreException;
 import org.bitcoinj.store.MemoryBlockStore;
 import org.bitcoinj.utils.Threading;
+import org.onixcoinj.core.AltcoinSerializer;
 import org.onixcoinj.core.CoinDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,8 +69,8 @@ public class OnixcoinMainNetParams extends AbstractOnixcoinParams {
 
         // https://github.com/jestevez/onixcoin/blob/28aec388d7014fcc2bf1de60f2113b85d1840ddf/src/main.cpp#L3105
         packetMagic = 0xf3c3b9de;
-
-        maxTarget = Utils.decodeCompactBits(0x1e0ffff0L);
+        maxTarget = Utils.decodeCompactBits(0x1e0fffffL); // DASH
+        //maxTarget = Utils.decodeCompactBits(0x1e0ffff0L);
         port = 41016;
         // https://github.com/jestevez/onixcoin/blob/28aec388d7014fcc2bf1de60f2113b85d1840ddf/src/base58.h#L275
         addressHeader = 75; // PUBKEY_ADDRESS
@@ -96,8 +97,7 @@ public class OnixcoinMainNetParams extends AbstractOnixcoinParams {
             "seed5.cryptolife.net",
             "seed2.cryptolife.net",
             "seed3.cryptolife.net",
-            "electrum6.cryptolife.net",
-            "seed.onixcoin.info"
+            "electrum6.cryptolife.net"
         };
         
         bip32HeaderPub = 0x049d7cb2;
@@ -173,34 +173,25 @@ public class OnixcoinMainNetParams extends AbstractOnixcoinParams {
     
     
     
-
+    // https://github.com/jestevez/onixcoin/blob/28aec388d7014fcc2bf1de60f2113b85d1840ddf/src/main.cpp#L1168
     private void checkDifficultyTransitions(StoredBlock storedPrev, Block nextBlock) throws BlockStoreException, VerificationException {
-        final long BlocksTargetSpacing	= 60; // 1 minutes
+        final long BlocksTargetSpacing	= 3 * 60;
         int TimeDaySeconds	= 60 * 60 * 24;
-        long	PastSecondsMin	= (long) (TimeDaySeconds * 0.25); //6 hours
-        long	PastSecondsMax	= TimeDaySeconds * 8; // 1 day
+        long	PastSecondsMin	= (long) (TimeDaySeconds * 3 * 0.1); 
+        long	PastSecondsMax	= (long) (TimeDaySeconds * 3 * 2.8);
         
-        if(storedPrev.getHeight()+1 <= 44877){
-            PastSecondsMin = (long) (TimeDaySeconds * 0.25);
-            PastSecondsMax = (long) (TimeDaySeconds * 7);      	
-        }
+        long	PastBlocksMin	= PastSecondsMin / BlocksTargetSpacing;
+        long	PastBlocksMax	= PastSecondsMax / BlocksTargetSpacing;
         
-        
-        if(storedPrev.getHeight()+1 <= 6000){
-            PastSecondsMin = (long) (TimeDaySeconds * 0.01);
-            PastSecondsMax = (long) (TimeDaySeconds * 0.14);       
-        
-        long	PastBlocksMin	= PastSecondsMin / BlocksTargetSpacing; //144 blocks
-        long	PastBlocksMax	= PastSecondsMax / BlocksTargetSpacing; //4032 blocks
-        
-//        if (!kgw.isNativeLibraryLoaded()){
-            KimotoGravityWell(storedPrev, nextBlock, BlocksTargetSpacing, PastBlocksMin, PastBlocksMax, blockStore);
-//        }else{
-//            kgw.KimotoGravityWell(storedPrev, nextBlock, BlocksTargetSpacing, PastBlocksMin, PastBlocksMax);
-//        }
-        }
+        // storedPrev.getHeight()+1
+        PastSecondsMin = (long) (TimeDaySeconds * 0.01);
+        PastSecondsMax = (long) (TimeDaySeconds * 0.14);       
+        KimotoGravityWell(storedPrev, nextBlock, BlocksTargetSpacing, PastBlocksMin, PastBlocksMax, blockStore);
+ 
     }
      
+    
+    // https://github.com/jestevez/onixcoin/blob/28aec388d7014fcc2bf1de60f2113b85d1840ddf/src/main.cpp#L1108
     private void KimotoGravityWell(StoredBlock storedPrev, Block nextBlock, long TargetBlocksSpacingSeconds, long PastBlocksMin, long PastBlocksMax,BlockStore blockStore)  throws BlockStoreException, VerificationException {
 	/* current difficulty formula, megacoin - kimoto gravity well */
         //const CBlockIndex  *BlockLastSolved				= pindexLast;
@@ -234,25 +225,15 @@ public class OnixcoinMainNetParams extends AbstractOnixcoinParams {
             PastBlocksMass++;
 
             if (i == 1)	{ PastDifficultyAverage = BlockReading.getHeader().getDifficultyTargetAsInteger(); }
-            else		{ PastDifficultyAverage = ((BlockReading.getHeader().getDifficultyTargetAsInteger().subtract(PastDifficultyAveragePrev)).divide(BigInteger.valueOf(i)).add(PastDifficultyAveragePrev)); }
+            else        { PastDifficultyAverage = ((BlockReading.getHeader().getDifficultyTargetAsInteger().subtract(PastDifficultyAveragePrev)).divide(BigInteger.valueOf(i)).add(PastDifficultyAveragePrev)); }
             PastDifficultyAveragePrev = PastDifficultyAverage;
-
-
-            if (BlockReading.getHeight() > 646120 && LatestBlockTime < BlockReading.getHeader().getTimeSeconds()) {
-                //eliminates the ability to go back in time
-                LatestBlockTime = BlockReading.getHeader().getTimeSeconds();
-            }
 
             PastRateActualSeconds			= BlockLastSolved.getHeader().getTimeSeconds() - BlockReading.getHeader().getTimeSeconds();
             PastRateTargetSeconds			= TargetBlocksSpacingSeconds * PastBlocksMass;
             PastRateAdjustmentRatio			= 1.0f;
-            if (BlockReading.getHeight() > 646120){
-                //this should slow down the upward difficulty change
-                if (PastRateActualSeconds < 5) { PastRateActualSeconds = 5; }
-            }
-            else {
-                if (PastRateActualSeconds < 0) { PastRateActualSeconds = 0; }
-            }
+            
+            if (PastRateActualSeconds < 0) { PastRateActualSeconds = 0; }
+            
             if (PastRateActualSeconds != 0 && PastRateTargetSeconds != 0) {
                 PastRateAdjustmentRatio			= (double)PastRateTargetSeconds / PastRateActualSeconds;
             }
@@ -294,8 +275,7 @@ public class OnixcoinMainNetParams extends AbstractOnixcoinParams {
             log.info("Difficulty hit proof of work limit: {}", newDifficulty.toString(16));
             newDifficulty = CoinDefinition.proofOfWorkLimit;
         }
-
-
+        
         //log.info("KGW-j Difficulty Calculated: {}", newDifficulty.toString(16));
         verifyDifficulty(newDifficulty, storedPrev, nextBlock);
 
@@ -334,109 +314,50 @@ public class OnixcoinMainNetParams extends AbstractOnixcoinParams {
         // The calculated difficulty is to a higher precision than received, so reduce here.
         BigInteger mask = BigInteger.valueOf(0xFFFFFFL).shiftLeft(accuracyBytes * 8);
         calcDiff = calcDiff.and(mask);
-        if(this.getId().compareTo(this.ID_TESTNET) == 0)
-        {
-            if (calcDiff.compareTo(receivedDifficulty) != 0)
-                throw new VerificationException("Network provided difficulty bits do not match what was calculated: " +
-                        receivedDifficulty.toString(16) + " vs " + calcDiff.toString(16));
-        }
-        else
-        {
+//        if(this.getId().compareTo(this.ID_TESTNET) == 0)
+//        {
+//            if (calcDiff.compareTo(receivedDifficulty) != 0)
+//                throw new VerificationException("Network provided difficulty bits do not match what was calculated: " +
+//                        receivedDifficulty.toString(16) + " vs " + calcDiff.toString(16));
+//        }
+//        else
+//        {
 
 
 
             int height = storedPrev.getHeight() + 1;
+            if(height == 1) {
+                 // FIXME Falta el calculo del Bloque 1 pre-minado!
+            }
             ///if(System.getProperty("os.name").toLowerCase().contains("windows"))
             //{
-            if(height <= 68589)
-            {
-                long nBitsNext = nextBlock.getDifficultyTarget();
-
-                long calcDiffBits = (accuracyBytes+3) << 24;
-                calcDiffBits |= calcDiff.shiftRight(accuracyBytes*8).longValue();
-
-                double n1 = ConvertBitsToDouble(calcDiffBits);
-                double n2 = ConvertBitsToDouble(nBitsNext);
-
-
-
-
-                if(java.lang.Math.abs(n1-n2) > n1*0.2)
-                              throw new VerificationException("Network provided difficulty bits do not match what was calculated: " +
-                                receivedDifficulty.toString(16) + " vs " + calcDiff.toString(16));
-
-
-            }
+//            if(height <= 68589)
+//            {
+//                long nBitsNext = nextBlock.getDifficultyTarget();
+//
+//                long calcDiffBits = (accuracyBytes+3) << 24;
+//                calcDiffBits |= calcDiff.shiftRight(accuracyBytes*8).longValue();
+//
+//                double n1 = ConvertBitsToDouble(calcDiffBits);
+//                double n2 = ConvertBitsToDouble(nBitsNext);
+//
+//
+//
+//
+//                if(java.lang.Math.abs(n1-n2) > n1*0.2)
+//                              throw new VerificationException("Network provided difficulty bits do not match what was calculated: " +
+//                                receivedDifficulty.toString(16) + " vs " + calcDiff.toString(16));
+//
+//
+//            }
             else
             {
                     if (calcDiff.compareTo(receivedDifficulty) != 0)
-                        throw new VerificationException("Network provided difficulty bits do not match what was calculated: " +
+                        throw new VerificationException("[BLOCK "+height+"] Network provided difficulty bits do not match what was calculated: " +
                                 receivedDifficulty.toString(16) + " vs " + calcDiff.toString(16));
             }
 
-
-
-            /*
-            if(height >= 34140)
-                {
-                    long nBitsNext = nextBlock.getDifficultyTarget();
-
-                    long calcDiffBits = (accuracyBytes+3) << 24;
-                    calcDiffBits |= calcDiff.shiftRight(accuracyBytes*8).longValue();
-
-                    double n1 = ConvertBitsToDouble(calcDiffBits);
-                    double n2 = ConvertBitsToDouble(nBitsNext);
-
-                    if(height <= 45000) {
-
-
-                        if(java.lang.Math.abs(n1-n2) > n1*0.2)
-                            throw new VerificationException("Network provided difficulty bits do not match what was calculated: " +
-                                    receivedDifficulty.toString(16) + " vs " + calcDiff.toString(16));
-
-
-                    }
-                    else if(java.lang.Math.abs(n1-n2) > n1*0.005)
-                        throw new VerificationException("Network provided difficulty bits do not match what was calculated: " +
-                                receivedDifficulty.toString(16) + " vs " + calcDiff.toString(16));
-
-                }
-                else
-                {
-                    if (calcDiff.compareTo(receivedDifficulty) != 0)
-                        throw new VerificationException("Network provided difficulty bits do not match what was calculated: " +
-                                receivedDifficulty.toString(16) + " vs " + calcDiff.toString(16));
-                }
-            */
-
-            //}
-            /*else
-            {
-
-            if(height >= 34140 && height <= 45000)
-            {
-                long nBitsNext = nextBlock.getDifficultyTarget();
-
-                long calcDiffBits = (accuracyBytes+3) << 24;
-                calcDiffBits |= calcDiff.shiftRight(accuracyBytes*8).longValue();
-
-                double n1 = ConvertBitsToDouble(calcDiffBits);
-                double n2 = ConvertBitsToDouble(nBitsNext);
-
-                if(java.lang.Math.abs(n1-n2) > n1*0.2)
-                    throw new VerificationException("Network provided difficulty bits do not match what was calculated: " +
-                            receivedDifficulty.toString(16) + " vs " + calcDiff.toString(16));
-
-            }
-            else
-            {
-                if (calcDiff.compareTo(receivedDifficulty) != 0)
-                    throw new VerificationException("Network provided difficulty bits do not match what was calculated: " +
-                            receivedDifficulty.toString(16) + " vs " + calcDiff.toString(16));
-            }
-
-            }*/
-        }
+//        }
     }
 
     private void checkTestnetDifficulty(StoredBlock storedPrev, Block prev, Block next) throws VerificationException, BlockStoreException {
@@ -483,5 +404,16 @@ public class OnixcoinMainNetParams extends AbstractOnixcoinParams {
             default:
                 return ONIXCOIN_PROTOCOL_VERSION_CURRENT;
         }
+    }
+    
+    @Override
+    public boolean allowMoreInventoryTypes() { return true; }
+
+    @Override
+    public boolean allowMoreMessages() { return true; }
+    
+    @Override
+    public AltcoinSerializer getSerializer(boolean parseRetain) {
+        return new AltcoinSerializer(this, parseRetain);
     }
 }

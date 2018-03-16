@@ -27,7 +27,12 @@
             <email>jose.estevez.prieto@gmail.com</email>
         </developer>
     </developers>
-
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
     <dependencies>
         
          <dependency>
@@ -43,9 +48,9 @@
         </dependency>
         
         <dependency>
-            <groupId>org.bitcoinj</groupId>
-            <artifactId>bitcoinj-core-jestevez</artifactId>
-            <version>0.15-SNAPSHOT</version>
+            <groupId>com.github.bisq-network.bitcoinj</groupId>
+            <artifactId>bitcoinj-core</artifactId>
+            <version>09679425</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

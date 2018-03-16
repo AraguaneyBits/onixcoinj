@@ -17,6 +17,7 @@
 package org.onixcoinj.wallet;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.util.Date;
 import org.bitcoinj.core.BlockChain;
 import org.bitcoinj.core.Coin;
@@ -62,6 +63,8 @@ public class RefreshWallet {
         BlockChain chain = new BlockChain(params, wallet, blockStore);
 
         final PeerGroup peerGroup = new PeerGroup(params, chain);
+        InetAddress addr = InetAddress.getByName("node.onixcoin.info");
+        peerGroup.addAddress(addr);
         peerGroup.startAsync();
 
         wallet.addCoinsReceivedEventListener(new WalletCoinsReceivedEventListener() {

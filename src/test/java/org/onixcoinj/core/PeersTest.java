@@ -43,7 +43,7 @@ public class PeersTest {
         Context context = new Context(params);
     }
 
-    @Test
+//    @Test
     public void testPeer() {
         try {
             BriefLogFormatter.init();

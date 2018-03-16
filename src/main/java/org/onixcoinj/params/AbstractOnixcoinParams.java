@@ -20,7 +20,11 @@ import org.bitcoinj.core.Coin;
 import static org.bitcoinj.core.Coin.COIN;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.StoredBlock;
 import org.bitcoinj.core.Utils;
+import org.bitcoinj.core.VerificationException;
+import org.bitcoinj.store.BlockStore;
+import org.bitcoinj.store.BlockStoreException;
 import org.bitcoinj.utils.MonetaryFormat;
 import org.dashj.hash.X11;
 import org.onixcoinj.core.AltcoinNetworkParameters;
@@ -170,5 +174,6 @@ public abstract class AbstractOnixcoinParams extends NetworkParameters implement
     public AltcoinSerializer getSerializer(boolean parseRetain) {
         return new AltcoinSerializer(this, parseRetain);
     }
-
+    @Override
+    public abstract void checkDifficultyTransitions(StoredBlock sb, Block block, BlockStore bs) throws VerificationException, BlockStoreException;
 }

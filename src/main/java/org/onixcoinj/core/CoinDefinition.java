@@ -156,7 +156,8 @@ public class CoinDefinition {
     public static int subsidyDecreaseBlockCount = 60 * COIN;     //main.cpp GetBlockValue(height, fee)
 
     public static BigInteger proofOfWorkLimit = org.bitcoinj.core.Utils.decodeCompactBits(0x1e0fffffL);  //main.cpp bnProofOfWorkLimit (~uint256(0) >> 20); // digitalcoin: starting difficulty is 1 / 2^12
-
+        //static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // ONIX: starting difficulty is 1 / 2^12
+        //static CBigNum bnInitialDifficulty(~uint256(0) >> 30);
     static public String[] testnetDnsSeeds = new String[]{
         "testnet-seed.onixcoin.io",
         "test.dnsseed.onixcoin.io",};
