@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>info.onixcoin</groupId>
     <artifactId>onixcoinj</artifactId>
-    <version>0.14-SNAPSHOT</version>
+    <version>0.14.1-RELEASE</version>
     <packaging>jar</packaging>
     <name>onixcoinj</name>
 
