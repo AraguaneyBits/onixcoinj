@@ -101,7 +101,8 @@ public class OnixcoinTestNetParams extends AbstractOnixcoinParams {
         majorityWindow = TESTNET_MAJORITY_WINDOW;
         
         dnsSeeds = new String[]{
-            "dnsseedt.onixcoin.info"
+            "dnsseedt.onixcoin.info",
+            "107.170.213.97" // Add @hbastidas testnet ip address testnet
         };
 
         bip32HeaderPub = 0x043587cf;
