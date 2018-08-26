@@ -87,7 +87,17 @@ public abstract class AbstractOnixcoinParams extends NetworkParameters implement
     /**
      * The string returned by getId() for regtest.
      */
-    public static final String ID_ONIX_REGTEST = "regtest";
+    public static final String ID_ONIX_REGTEST = "info.onixcoin.regtest";
+
+    /** The string returned by getId() for the main, production network where people trade things. */
+    public static final String ID_MAINNET = ID_ONIX_MAINNET ;
+    /** The string returned by getId() for the testnet. */
+    public static final String ID_TESTNET = ID_ONIX_TESTNET ;
+    /** The string returned by getId() for regtest mode. */
+    public static final String ID_REGTEST = ID_ONIX_REGTEST;
+    /** Unit test network. */
+    public static final String ID_UNITTESTNET = "info.onixcoin.unittest";
+
 
     public static final int ONIXCOIN_PROTOCOL_VERSION_MINIMUM = 70010;
     public static final int ONIXCOIN_PROTOCOL_VERSION_CURRENT = 70010;
@@ -103,14 +113,8 @@ public abstract class AbstractOnixcoinParams extends NetworkParameters implement
         targetTimespan = ONIX_TARGET_TIMESPAN;
         maxTarget = Utils.decodeCompactBits(0x1e0fffffL); // TODO: figure out the Onixcoin value of this
 
-        // https://github.com/jestevez/onixcore/blob/3d308b7c2f040f3347f09d0f6eedf4c6847b037c/networks.js#L9
-        packetMagic = 0xf3c3b9de;
-        // https://github.com/jestevez/onixcore/blob/3d308b7c2f040f3347f09d0f6eedf4c6847b037c/networks.js#L13
-        bip32HeaderPub = 0x049d7cb2; //The 4 byte header that serializes in base58 to "xpub". (?)
-        // https://github.com/jestevez/onixcore/blob/3d308b7c2f040f3347f09d0f6eedf4c6847b037c/networks.js#L14
-        bip32HeaderPriv = 0x049d7878; //The 4 byte header that serializes in base58 to "xprv" (?)
-
     }
+    
 
     @Override
     public Coin getBlockSubsidy(final int height) {
@@ -175,5 +179,16 @@ public abstract class AbstractOnixcoinParams extends NetworkParameters implement
         return new AltcoinSerializer(this, parseRetain);
     }
     @Override
-    public abstract void checkDifficultyTransitions(StoredBlock sb, Block block, BlockStore bs) throws VerificationException, BlockStoreException;
+    public abstract void checkDifficultyTransitions(StoredBlock sb, Block block, BlockStore bs) throws VerificationException, BlockStoreException;   
+
+    /** Returns the network parameters for the given string ID or NULL if not recognized. */
+    public static NetworkParameters fromID(String id) {
+        if (id.equals(ID_MAINNET)) {
+            return org.onixcoinj.params.OnixcoinMainNetParams.get();
+        } else if (id.equals(ID_TESTNET)) {
+            return org.onixcoinj.params.OnixcoinTestNetParams.get();
+        } else {
+            return null;
+        }
+    }
 }
